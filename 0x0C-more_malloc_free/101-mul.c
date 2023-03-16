@@ -129,5 +129,6 @@ int main(int argc, char *argv[])
 		_putchar('\n');
 	}
 	else
-	multiply(n1, n2);
+		multiply(n1, n2);
+	return (0);
 }
