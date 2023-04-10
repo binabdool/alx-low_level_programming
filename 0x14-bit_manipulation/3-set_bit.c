@@ -15,9 +15,9 @@ int set_bit(unsigned long int *n, unsigned int index)
 	if (index > 63)
 		return (-1);
 
-	mum = 1 << index;
+	num = 1 << index;
 	/*num <<= index is the same as num = num << index*/
-	*n = (*n | mum);
+	*n = (*n | num);
 	/*bitwise OR operator*/
 	return (1);
 }
