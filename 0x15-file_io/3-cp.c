@@ -1,41 +1,103 @@
 #include "main.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+char *create_buffer(char *file);
+void close_file(int fd);
 
 /**
- * _strlen - finds the length of a string
- * @str: pointer to the string
+ * create_buffer - Allocates 1024 bytes for a buffer.
+ * @file: The name of the file buffer is storing chars for.
  *
- * Return: length of the string
+ * Return: A pointer to the newly-allocated buffer.
  */
-size_t _strlen(char *str)
+char *create_buffer(char *file)
 {
-	size_t r;
+	char *buffer;
 
-	for (r = 0; str[r]; r++)
-		;
-	return (r);
+	buffer = malloc(sizeof(char) * 1024);
+
+	if (buffer == NULL)
+	{
+		dprintf(STDERR_FILENO,
+			"Error: Can't write to %s\n", file);
+		exit(99);
+	}
+
+	return (buffer);
 }
 
 /**
- * create_file - creates a file.
- * @filename: name of the file to create
- * @text_content: NULL terminated string to write to the file
- *
- * Return: 1 on success, -1 on failure
+ * close_file - Closes file descriptors.
+ * @fd: The file descriptor to be closed.
  */
-int create_file(const char *filename, char *text_content)
+void close_file(int fd)
 {
 	int d;
-	ssize_t tet = 0;
 
-	if (filename == NULL)
-		return (-1);
-	d = open(filename, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+	d = close(fd);
+
 	if (d == -1)
-		return (-1);
-	if (text_content != NULL)
-		tet = write(fd, text_content, _strlen(text_content));
-	close(d);
-	if (tet == -1)
-		return (-1);
-	return (1);
+	{
+		dprintf(STDERR_FILENO, "Error: Can't close fd %d\n", fd);
+		exit(100);
+	}
+}
+
+/**
+ * main - Copies the contents of a file to another file.
+ * @argc: The number of arguments supplied to the program.
+ * @argv: An array of pointers to the arguments.
+ *
+ * Return: 0 on success.
+ *
+ * Description: If the argument count is incorrect - exit code 97.
+ *              If file_from does not exist or cannot be read - exit code 98.
+ *              If file_to cannot be created or written to - exit code 99.
+ *              If file_to or file_from cannot be closed - exit code 100.
+ */
+int main(int argc, char *argv[])
+{
+	int from, tet, u, v;
+	char *buffer;
+
+	if (argc != 3)
+	{
+		dprintf(STDERR_FILENO, "Usage: cp file_from file_to\n");
+		exit(97);
+	}
+
+	buffer = create_buffer(argv[2]);
+	from = open(argv[1], O_RDONLY);
+	u = read(from, buffer, 1024);
+	tet = open(argv[2], O_CREAT | O_WRONLY | O_TRUNC, 0664);
+
+	do {
+		if (from == -1 || u == -1)
+		{
+			dprintf(STDERR_FILENO,
+				"Error: Can't read from file %s\n", argv[1]);
+			free(buffer);
+			exit(98);
+		}
+
+		v = write(tet, buffer, u);
+		if (tet == -1 || v == -1)
+		{
+			dprintf(STDERR_FILENO,
+				"Error: Can't write to %s\n", argv[2]);
+			free(buffer);
+			exit(99);
+		}
+
+		u = read(from, buffer, 1024);
+		tet = open(argv[2], O_WRONLY | O_APPEND);
+
+	} while (u > 0);
+
+	free(buffer);
+	close_file(from);
+	close_file(tet);
+
+	return (0);
 }
