@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void check_elf(unsigned char *ident);
-void print_magic(unsigned char *ident);
+void check_elf(unsigned char *e_ident);
+void print_magic(unsigned char *e_ident);
 void print_class(unsigned char *e_ident);
 void print_data(unsigned char *e_ident);
 void print_version(unsigned char *e_ident);
@@ -23,16 +23,16 @@ void close_elf(int elf);
  *
  * Description: If the file is not an ELF file - exit code 98.
  */
-void check_elf(unsigned char *ident)
+void check_elf(unsigned char *e_ident)
 {
-	int text;
+	int index;
 
-	for (text = 0; text < 4; text++)
+	for (index = 0; index < 4; index++)
 	{
-		if (ident[text] != 127 &&
-		    ident[text] != 'E' &&
-		    ident[text] != 'L' &&
-		    ident[text] != 'F')
+		if (e_ident[index] != 127 &&
+		    e_ident[index] != 'E' &&
+		    e_ident[index] != 'L' &&
+		    e_ident[index] != 'F')
 		{
 			dprintf(STDERR_FILENO, "Error: Not an ELF file\n");
 			exit(98);
@@ -46,17 +46,17 @@ void check_elf(unsigned char *ident)
  *
  * Description: Magic numbers are separated by spaces.
  */
-void print_magic(unsigned char *ident)
+void print_magic(unsigned char *e_ident)
 {
-	int text;
+	int index;
 
 	printf("  Magic:   ");
 
-	for (text = 0; text < EI_NIDENT; text++)
+	for (index = 0; index < EI_NIDENT; index++)
 	{
-		printf("%02x", ident[text]);
+		printf("%02x", e_ident[index]);
 
-		if (text == EI_NIDENT - 1)
+		if (index == EI_NIDENT - 1)
 			printf("\n");
 		else
 			printf(" ");
