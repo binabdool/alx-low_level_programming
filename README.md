@@ -26,7 +26,8 @@ This repository contains programs written for the low-level programming and algo
 0x15. C - File I/O
 0x16. C - Simple Shell
 
-Author ✒️
+Author ✒️ 
+
 Abdulwahab Abdulaziz <binabdool>
 
 Acknowledgements 🙏
